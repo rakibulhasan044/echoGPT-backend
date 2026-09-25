@@ -1,15 +1,17 @@
 model User {
-  id              String   @id @default(uuid())
-  email           String   @unique
-  passwordHash    String
-  fullName        String?
-  role            Role     @default(USER)
-  isEmailVerified Boolean  @default(false)
-  isActive        Boolean  @default(true)
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id               String   @id @default(uuid())
+  email            String   @unique
+  passwordHash     String
+  fullName         String?
+  role             Role     @default(USER)
+  isEmailVerified  Boolean  @default(false)
+  isActive         Boolean  @default(true)
+  stripeCustomerId String?  @unique
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
 
-  sessions Session[]
+  sessions     Session[]
+  subscription Subscription?
 
   @@index([email])
   @@map("users")
