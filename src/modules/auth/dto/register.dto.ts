@@ -12,7 +12,7 @@ export class RegisterDto {
 
   @ApiProperty({
     description: 'The password for the account (minimum 6 characters)',
-    example: 'SecurePassword123!',
+    example: '123456',
     minLength: 6,
   })
   @IsString()
@@ -22,7 +22,7 @@ export class RegisterDto {
 
   @ApiPropertyOptional({
     description: 'The full name of the user',
-    example: 'John Doe',
+    example: 'User Name',
   })
   @IsString()
   @IsOptional()

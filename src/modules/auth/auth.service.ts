@@ -4,6 +4,7 @@ import { RegisterDto } from './dto/register.dto.js';
 import { VerifyEmailDto } from './dto/verify-email.dto.js';
 import { LoginDto } from './dto/login.dto.js';
 import { ResendOtpDto } from './dto/resend-otp.dto.js';
+import { LogoutDto } from './dto/logout.dto.js';
 import { UnauthorizedException } from '@nestjs/common';
 import { TokenService } from './application/token.service.js';
 import { SessionService } from './application/session.service.js';
@@ -147,6 +148,7 @@ export class AuthService {
     // Issue tokens so they are automatically logged in
     const tokens = await this.sessionService.issueTokenPair({
       sub: user.id,
+      email: user.email,
       role: user.role,
     });
 
@@ -182,6 +184,7 @@ export class AuthService {
     // Issue tokens
     const tokens = await this.sessionService.issueTokenPair({
       sub: user.id,
+      email: user.email,
       role: user.role,
     });
 
@@ -231,4 +234,49 @@ export class AuthService {
       throw new InternalServerErrorException('Failed to resend verification code. Please try again later.');
     }
   }
+
+  async logout(logoutDto: LogoutDto, userId: string) {
+    await this.sessionService.revokeByRefreshToken(logoutDto.refreshToken, userId);
+    return null;
+  }
+
+  async logoutAll(userId: string) {
+    await this.sessionService.revokeAllUserSessions(userId);
+    return null;
+  }
+
+  async refreshSession(refreshToken: string) {
+    if (!refreshToken) {
+      throw new UnauthorizedException('Refresh token is required.');
+    }
+
+    const session = await this.sessionService.findByRefreshToken(refreshToken);
+    if (!session || session.isRevoked || session.expiresAt < new Date()) {
+      throw new UnauthorizedException('Invalid or expired refresh token. Please sign in again.');
+    }
+
+    // Ensure the user account is active
+    if (!session.user.isActive) {
+      throw new UnauthorizedException('This account has been disabled.');
+    }
+
+    // Rotate the refresh token
+    const newRefreshToken = await this.sessionService.rotateRefreshSession({
+      sessionId: session.id,
+      userId: session.userId,
+    });
+
+    // Create a new access token
+    const newAccessToken = await this.tokenService.generateAccessToken({
+      sub: session.user.id,
+      email: session.user.email,
+      role: session.user.role,
+    });
+
+    return {
+      accessToken: newAccessToken,
+      refreshToken: newRefreshToken,
+    };
+  }
 }
+

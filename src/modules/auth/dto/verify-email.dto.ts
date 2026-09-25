@@ -4,7 +4,7 @@ import { IsEmail, IsNotEmpty, IsString, Length } from 'class-validator';
 export class VerifyEmailDto {
   @ApiProperty({
     description: 'The email address of the user',
-    example: 'user@example.com',
+    example: 'user@gmail.com',
   })
   @IsEmail({}, { message: 'Please provide a valid email address' })
   @IsNotEmpty({ message: 'Email is required' })

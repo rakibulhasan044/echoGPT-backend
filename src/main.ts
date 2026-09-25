@@ -1,4 +1,5 @@
 import { NestFactory } from '@nestjs/core';
+import cookieParser from 'cookie-parser';
 import { ConfigService } from '@nestjs/config';
 
 import { AppModule } from './app.module.js';
@@ -35,6 +36,9 @@ async function bootstrap() {
 
   // Global configuration
   setupGlobalConfig(app);
+
+  // Cookies
+  app.use(cookieParser());
 
   // CORS
   app.enableCors();

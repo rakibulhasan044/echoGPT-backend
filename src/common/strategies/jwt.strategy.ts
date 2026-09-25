@@ -8,6 +8,7 @@ import { PrismaService } from '../../prisma/prisma.service.js';
 
 export type JwtPayload = {
   sub: string;
+  email: string;
   role: Role;
 };
 
@@ -30,7 +31,11 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     private prisma: PrismaService,
   ) {
     super({
-      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      jwtFromRequest: ExtractJwt.fromExtractors([
+        (request: Request) => {
+          return request?.cookies?.accessToken || ExtractJwt.fromAuthHeaderAsBearerToken()(request);
+        },
+      ]),
       secretOrKey: (configService.get<string>('app.jwtAccessSecret') || process.env.JWT_ACCESS_SECRET) as string,
       ignoreExpiration: false,
     });
