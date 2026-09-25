@@ -1,18 +1,23 @@
 import { Body, Controller, Post, HttpCode, HttpStatus } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBody, ApiBadRequestResponse, ApiConflictResponse, ApiOkResponse } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiBody, ApiBadRequestResponse, ApiConflictResponse } from '@nestjs/swagger';
 import { RegisterDto } from './dto/register.dto.js';
 import { Public } from '../../common/decorators/public.decorator.js';
+import { AuthService } from './auth.service.js';
+import { ResponseMessage } from '../../common/decorators/response-message.decorator.js';
 
 @ApiTags('Authentication')
 @Controller('auth')
 export class AuthController {
   
+  constructor(private readonly authService: AuthService) {}
+
   @Public() // Bypasses the JwtAuthGuard
   @Post('register')
   @HttpCode(HttpStatus.CREATED)
+  @ResponseMessage('Registration successful. Please check your email for the verification code.')
   @ApiOperation({ 
     summary: 'Register a new user', 
-    description: 'Creates a new user account and returns an initial set of authentication tokens.' 
+    description: 'Creates a new user account, generates an OTP, and sends a verification email.' 
   })
   @ApiBody({ 
     type: RegisterDto,
@@ -20,13 +25,20 @@ export class AuthController {
   })
   @ApiResponse({
     status: HttpStatus.CREATED,
-    description: 'User successfully registered.',
+    description: 'User successfully registered and OTP sent.',
     schema: {
       example: {
-        message: 'Registration successful',
+        success: true,
+        message: 'Registration successful. Please check your email for the verification code.',
         data: {
-          accessToken: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
-          refreshToken: 'a1b2c3d4e5f6g7h8i9j0...'
+          id: '550e8400-e29b-41d4-a716-446655440000',
+          email: 'user@example.com',
+          fullName: 'John Doe',
+          role: 'USER',
+          isEmailVerified: false,
+          isActive: true,
+          createdAt: '2026-09-25T12:00:00.000Z',
+          updatedAt: '2026-09-25T12:00:00.000Z'
         }
       }
     }
@@ -49,13 +61,6 @@ export class AuthController {
     }
   })
   async register(@Body() registerDto: RegisterDto) {
-    // Implementation would go here, usually calling authService.register(registerDto)
-    return {
-      message: 'Registration successful',
-      data: {
-        accessToken: 'mock-access-token',
-        refreshToken: 'mock-refresh-token'
-      }
-    };
+    return this.authService.register(registerDto);
   }
 }

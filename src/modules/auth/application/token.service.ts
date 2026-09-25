@@ -14,8 +14,7 @@ export class TokenService {
   ) {}
 
   async generateAccessToken(payload: JwtPayload) {
-    const secret = this.configService.get<string>('app.jwtAccessSecret');
-    return this.jwt.signAsync(payload, { secret });
+    return this.jwt.signAsync(payload);
   }
 
   generateRefreshToken() {

@@ -1,0 +1,11 @@
+model Otp {
+  id           String   @id @default(uuid())
+  email        String
+  codeHash     String
+  attemptCount Int      @default(0)
+  expiresAt    DateTime
+  createdAt    DateTime @default(now())
+
+  @@index([email])
+  @@map("otps")
+}
