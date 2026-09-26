@@ -2,6 +2,8 @@ import { Injectable, NotFoundException, ConflictException, InternalServerErrorEx
 import { PrismaService } from '../../prisma/prisma.service.js';
 import { ConfigService } from '@nestjs/config';
 import { CreatePlanDto, UpdatePlanDto } from './dto/plan.dto.js';
+import { UserQueryDto } from './dto/user-query.dto.js';
+
 import Stripe from 'stripe';
 
 @Injectable()
@@ -18,9 +20,6 @@ export class AdminService {
     });
   }
 
-  // ========================
-  // PLAN MANAGEMENT
-  // ========================
   async createPlan(dto: CreatePlanDto) {
     const existing = await this.prisma.plan.findUnique({ where: { name: dto.name } });
     if (existing) {
@@ -113,9 +112,6 @@ export class AdminService {
     return this.prisma.plan.findMany({ orderBy: { price: 'asc' } });
   }
 
-  // ========================
-  // SUBSCRIPTION MANAGEMENT
-  // ========================
   async getAllSubscriptions() {
     return this.prisma.subscription.findMany({
       include: {
@@ -126,4 +122,78 @@ export class AdminService {
       orderBy: { createdAt: 'desc' }
     });
   }
+
+  async getAllUsers(query: UserQueryDto) {
+    const { page = 1, limit = 10, search, role, isActive } = query;
+    const skip = (page - 1) * limit;
+
+    const where: any = {};
+
+    if (search) {
+      where.OR = [
+        { email: { contains: search, mode: 'insensitive' } },
+        { fullName: { contains: search, mode: 'insensitive' } }
+      ];
+    }
+
+    if (role) {
+      where.role = role;
+    }
+
+    if (isActive !== undefined) {
+      where.isActive = isActive;
+    }
+
+    const [total, data] = await Promise.all([
+      this.prisma.user.count({ where }),
+      this.prisma.user.findMany({
+        where,
+        skip,
+        take: limit,
+        select: {
+          id: true,
+          email: true,
+          fullName: true,
+          role: true,
+          isActive: true,
+          isEmailVerified: true,
+          createdAt: true,
+        },
+        orderBy: { createdAt: 'desc' }
+      })
+    ]);
+
+    return {
+      data,
+      meta: {
+        total,
+        page,
+        limit,
+        lastPage: Math.ceil(total / limit)
+      }
+    };
+  }
+
+  async updateUserStatus(id: string, isActive: boolean) {
+    const user = await this.prisma.user.findUnique({ where: { id } });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    // Prevent admin from restricting themselves
+    if (user.role === 'ADMIN' && !isActive) {
+      throw new ConflictException('You cannot restrict an admin account.');
+    }
+
+    return this.prisma.user.update({
+      where: { id },
+      data: { isActive },
+      select: {
+        id: true,
+        email: true,
+        isActive: true,
+      }
+    });
+  }
+
 }

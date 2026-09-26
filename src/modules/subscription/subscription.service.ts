@@ -184,9 +184,9 @@ export class SubscriptionService {
       return {
         planName: 'FREE',
         status: 'ACTIVE',
-        requestLimit: 50,
+        requestLimit: 3,
         requestsUsed: 0,
-        remainingRequests: 50,
+        remainingRequests: 3,
         currentPeriodEnd: null,
       };
     }

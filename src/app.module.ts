@@ -11,6 +11,7 @@ import { UserModule } from './modules/user/user.module.js';
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard.js';
 import { SubscriptionModule } from './modules/subscription/subscription.module.js';
 import { AdminModule } from './modules/admin/admin.module.js';
+import { ProviderModule } from './modules/provider/provider.module.js';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { AdminModule } from './modules/admin/admin.module.js';
     UserModule,
     SubscriptionModule,
     AdminModule,
+    ProviderModule,
   ],
   controllers: [AppController],
   providers: [

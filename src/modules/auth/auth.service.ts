@@ -50,6 +50,14 @@ export class AuthService {
             passwordHash,
             fullName,
             isEmailVerified: false,
+            subscription: {
+              create: {
+                planName: 'FREE',
+                status: 'ACTIVE',
+                requestLimit: 3,
+                requestsUsed: 0,
+              }
+            }
           },
           select: {
             id: true,
@@ -173,7 +181,7 @@ export class AuthService {
 
     // Ensure account is active
     if (!user.isActive) {
-      throw new UnauthorizedException('This account has been disabled. Please contact support.');
+      throw new UnauthorizedException('your account has been restricted .conatct admin');
     }
 
     // Ensure email is verified

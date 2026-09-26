@@ -1,10 +1,12 @@
-import { Controller, Get, Post, Patch, Delete, Param, Body, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Delete, Param, Body, Query, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { AdminService } from './admin.service.js';
 import { AdminGuard } from '../../common/guards/admin.guard.js';
 
 
 import { CreatePlanDto, UpdatePlanDto } from './dto/plan.dto.js';
+import { UpdateUserStatusDto } from './dto/user.dto.js';
+import { UserQueryDto } from './dto/user-query.dto.js';
 import { ResponseMessage } from '../../common/decorators/response-message.decorator.js';
 
 @ApiTags('Admin Panel')
@@ -49,4 +51,19 @@ export class AdminController {
   async getAllSubscriptions() {
     return this.adminService.getAllSubscriptions();
   }
+
+  @Get('users')
+  @ResponseMessage('Users retrieved successfully')
+  @ApiOperation({ summary: 'Get all registered users with pagination and filters' })
+  async getAllUsers(@Query() query: UserQueryDto) {
+    return this.adminService.getAllUsers(query);
+  }
+
+  @Patch('users/:id/status')
+  @ResponseMessage('User status updated successfully')
+  @ApiOperation({ summary: 'Restrict or unrestrict a user' })
+  async updateUserStatus(@Param('id') id: string, @Body() dto: UpdateUserStatusDto) {
+    return this.adminService.updateUserStatus(id, dto.isActive);
+  }
+
 }
