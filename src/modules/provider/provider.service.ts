@@ -18,7 +18,7 @@ export class ProviderService {
       throw new ConflictException(`A provider named ${dto.name} already exists.`);
     }
 
-    const secretKey = this.configService.get<string>('DEFAULT_ENCRYPTION_KEY');
+    const secretKey = this.configService.get<string>('ENCRYPTION_KEY');
     if (!secretKey || secretKey.length !== 32) {
       throw new InternalServerErrorException('Server encryption key is missing or invalid.');
     }
@@ -50,7 +50,7 @@ export class ProviderService {
       throw new NotFoundException('Provider not found');
     }
 
-    const secretKey = this.configService.get<string>('DEFAULT_ENCRYPTION_KEY');
+    const secretKey = this.configService.get<string>('ENCRYPTION_KEY');
     if (!secretKey || secretKey.length !== 32) {
       throw new InternalServerErrorException('Server encryption key is missing or invalid.');
     }
@@ -104,7 +104,7 @@ export class ProviderService {
       throw new NotFoundException('Provider not found');
     }
 
-    const secretKey = this.configService.get<string>('DEFAULT_ENCRYPTION_KEY');
+    const secretKey = this.configService.get<string>('ENCRYPTION_KEY');
     if (!secretKey || secretKey.length !== 32) {
       throw new InternalServerErrorException('Server encryption key is missing or invalid.');
     }

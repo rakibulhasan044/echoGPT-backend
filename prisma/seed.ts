@@ -45,6 +45,34 @@ async function main() {
 
     console.log(`Admin user ${adminEmail} created successfully.`);
   }
+
+  // Seed Default AI Provider
+  const defaultAiProviderKey = process.env.DEFAULT_AI_PROVIDER;
+  const encryptionKey = process.env.ENCRYPTION_KEY;
+
+  if (defaultAiProviderKey && encryptionKey) {
+    const existingProvider = await prisma.provider.findFirst({
+      where: { isDefault: true },
+    });
+
+    if (!existingProvider) {
+      const { encrypt } = await import('../src/common/utils/encryption.util.js');
+      const encryptedKey = encrypt(defaultAiProviderKey, encryptionKey);
+
+      await prisma.provider.create({
+        data: {
+          name: 'OpenAI', // Can be changed later in Admin Panel
+          baseUrl: 'https://api.openai.com/v1',
+          apiKey: encryptedKey,
+          isDefault: true,
+          isActive: true,
+        },
+      });
+      console.log('Default AI Provider seeded successfully.');
+    } else {
+      console.log('Default AI Provider already exists.');
+    }
+  }
 }
 
 main()

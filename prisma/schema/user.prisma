@@ -10,9 +10,12 @@ model User {
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
 
-  sessions     Session[]
-  subscription Subscription?
-  payments     Payment[]
+  sessions          Session[]
+  subscription      Subscription?
+  payments          Payment[]
+  chatConversations ChatConversation[]
+  searchQueries     SearchQuery[]
+  apiUsageLogs      ApiUsageLog[]
 
   @@index([email])
   @@map("users")

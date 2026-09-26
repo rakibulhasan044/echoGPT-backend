@@ -1,0 +1,13 @@
+model SearchQuery {
+  id         String   @id @default(uuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  query      String
+  resultJson Json? // cached provider/search results
+  isCached   Boolean  @default(false)
+  createdAt  DateTime @default(now())
+
+  @@index([userId])
+  @@index([query])
+  @@map("search_queries")
+}

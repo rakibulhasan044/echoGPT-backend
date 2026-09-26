@@ -8,5 +8,8 @@ model Provider {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  chatConversations ChatConversation[]
+  chatMessages      ChatMessage[]
+
   @@map("providers")
 }

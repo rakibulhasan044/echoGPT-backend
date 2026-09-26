@@ -1,0 +1,16 @@
+model ApiUsageLog {
+  id         String   @id @default(uuid())
+  userId     String?
+  user       User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  providerId String?
+  endpoint   String
+  method     String
+  statusCode Int
+  latencyMs  Int?
+  createdAt  DateTime @default(now())
+
+  @@index([userId])
+  @@index([endpoint])
+  @@index([createdAt])
+  @@map("api_usage_logs")
+}
