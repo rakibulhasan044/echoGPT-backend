@@ -17,8 +17,9 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Get('profile')
+  @ResponseMessage('Profile retrieved successfully.')
   @ApiOperation({ summary: 'Get current user profile', description: 'Retrieves the profile of the currently authenticated user.' })
-  @ApiSuccessResponse(UserResponseDto, 'Operation successful')
+  @ApiSuccessResponse(UserResponseDto, 'Profile retrieved successfully.')
 
   async getProfile(@CurrentUser('id') userId: string) {
     return this.userService.getProfile(userId);

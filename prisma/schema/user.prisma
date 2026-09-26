@@ -12,6 +12,7 @@ model User {
 
   sessions     Session[]
   subscription Subscription?
+  payments     Payment[]
 
   @@index([email])
   @@map("users")

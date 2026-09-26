@@ -102,7 +102,7 @@ export function setupGlobalConfig(app: INestApplication) {
   });
 
   // Global prefix
-  app.setGlobalPrefix(apiPrefix);
+  app.setGlobalPrefix(apiPrefix, { exclude: ['/'] });
 
   // Global Exception Filter
   app.useGlobalFilters(new GlobalExceptionFilter());

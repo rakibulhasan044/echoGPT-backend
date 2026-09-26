@@ -6,6 +6,10 @@ import { AllConfigType } from '../types/config.type.js';
 function resolveBaseUrl(backendDomain: string, port: number): string {
   const cleanedDomain = backendDomain.replace(/\/+$/, '');
 
+  if (cleanedDomain.includes(`:${port}`)) {
+    return cleanedDomain;
+  }
+
   const isLocalhost = cleanedDomain.includes('localhost');
   const isIpAddress = /^https?:\/\/(\d{1,3}\.){3}\d{1,3}$/.test(cleanedDomain);
 
@@ -33,7 +37,7 @@ export function setupSwagger(app: INestApplication) {
     .setDescription('Comprehensive API documentation for echoGPT Backend application')
     .setVersion('1.0.0')
     .addServer(baseUrl, 'Development Server')
-    .addServer('http://localhost:5003', 'Local Network Server')
+    .addServer('http://localhost:6001', 'Local Network Server')
     .addBearerAuth({
       type: 'http',
       scheme: 'bearer',

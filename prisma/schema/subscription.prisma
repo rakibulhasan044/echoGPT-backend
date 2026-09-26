@@ -1,8 +1,11 @@
 model Subscription {
-  id                   String             @id @default(uuid())
-  userId               String             @unique
-  user                 User               @relation(fields: [userId], references: [id], onDelete: Cascade)
-  plan                 SubscriptionPlan   @default(FREE)
+  id     String @id @default(uuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  planId               String?
+  planRelation         Plan?              @relation(fields: [planId], references: [id])
+  planName             String             @default("FREE")
   status               SubscriptionStatus @default(ACTIVE)
   requestLimit         Int                @default(50)
   requestsUsed         Int                @default(0)
@@ -14,12 +17,9 @@ model Subscription {
   createdAt            DateTime           @default(now())
   updatedAt            DateTime           @updatedAt
 
-  @@map("subscriptions")
-}
+  payments Payment[]
 
-enum SubscriptionPlan {
-  FREE
-  PREMIUM
+  @@map("subscriptions")
 }
 
 enum SubscriptionStatus {

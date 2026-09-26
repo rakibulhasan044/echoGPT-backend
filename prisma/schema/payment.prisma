@@ -1,0 +1,28 @@
+model Payment {
+  id                 String        @id @default(uuid())
+  amount             Float
+  transactionId      String        @unique // e.g., the Stripe charge/invoice ID
+  stripeEventId      String?       @unique // e.g., the Stripe event ID for idempotency
+  status             PaymentStatus @default(UNPAID)
+  paymentGatewayData Json? // Store the raw Stripe receipt JSON here
+
+  // Relations
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  subscriptionId String?
+  subscription   Subscription? @relation(fields: [subscriptionId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([transactionId])
+  @@map("payments")
+}
+
+enum PaymentStatus {
+  PAID
+  UNPAID
+  FAILED
+  REFUNDED
+}

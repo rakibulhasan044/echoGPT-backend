@@ -1,0 +1,14 @@
+model Plan {
+  id            String         @id @default(uuid())
+  name          String         @unique
+  price         Float          @default(0.0)
+  stripePriceId String?
+  requestLimit  Int            @default(50)
+  benefits      String[]
+  isActive      Boolean        @default(true)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  subscriptions Subscription[]
+
+  @@map("plans")
+}

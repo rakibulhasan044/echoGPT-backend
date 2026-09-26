@@ -9,6 +9,7 @@ import { setupSwagger } from './common/setup/swagger.setup.js';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
+    rawBody: true, // Required for Stripe Webhook Signature Verification
     logger: ['error', 'warn', 'log', 'debug', 'verbose'],
   });
 
@@ -32,7 +33,7 @@ async function bootstrap() {
     infer: true,
   });
 
-  const domainWithPort = `${backendDomain}:${port}`;
+  const domainWithPort = backendDomain.includes(`:${port}`) ? backendDomain : (backendDomain.includes('localhost') || /^https?:\/\/(\d{1,3}\.){3}\d{1,3}$/.test(backendDomain) ? `${backendDomain}:${port}` : backendDomain);
 
   // Global configuration
   setupGlobalConfig(app);

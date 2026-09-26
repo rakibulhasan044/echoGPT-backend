@@ -65,6 +65,9 @@ importers:
       rxjs:
         specifier: ^7.8.1
         version: 7.8.2
+      stripe:
+        specifier: ^22.6.2
+        version: 22.6.2(@types/node@24.13.6)
     devDependencies:
       '@nestjs/cli':
         specifier: ^12.0.0
@@ -2488,6 +2491,15 @@ packages:
   strip-bom@3.0.0:
     resolution: {integrity: sha512-vavAMRXOgBVNF6nyEEmL3DBK19iRpDcoIwW+swQ+CbGiu7lju6t+JklA1MHweoWtadgt4ISVUsXLyDq34ddcwA==}
     engines: {node: '>=4'}
+
+  stripe@22.6.2:
+    resolution: {integrity: sha512-PwRE2scocvXqDKPiskMa5vRJEAEkq46W69XyUYmAwrNSLr675lQnfqLwnsndAWizwgihOWw/irLmoFRo3ez7ew==}
+    engines: {node: '>=18'}
+    peerDependencies:
+      '@types/node': '>=18'
+    peerDependenciesMeta:
+      '@types/node':
+        optional: true
 
   strtok3@10.3.5:
     resolution: {integrity: sha512-ki4hZQfh5rX0QDLLkOCj+h+CVNkqmp/CMf8v8kZpkNVK6jGQooMytqzLZYUVYIZcFZ6yDB70EfD8POcFXiF5oA==}
@@ -4992,6 +5004,10 @@ snapshots:
       ansi-regex: 6.3.0
 
   strip-bom@3.0.0: {}
+
+  stripe@22.6.2(@types/node@24.13.6):
+    optionalDependencies:
+      '@types/node': 24.13.6
 
   strtok3@10.3.5:
     dependencies:
