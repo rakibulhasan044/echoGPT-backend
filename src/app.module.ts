@@ -12,6 +12,8 @@ import { JwtAuthGuard } from './common/guards/jwt-auth.guard.js';
 import { SubscriptionModule } from './modules/subscription/subscription.module.js';
 import { AdminModule } from './modules/admin/admin.module.js';
 import { ProviderModule } from './modules/provider/provider.module.js';
+import { ChatModule } from './modules/chat/chat.module.js';
+import { WebSearchApiModule } from './modules/web-search-api/web-search-api.module.js';
 
 @Module({
   imports: [
@@ -26,6 +28,8 @@ import { ProviderModule } from './modules/provider/provider.module.js';
     SubscriptionModule,
     AdminModule,
     ProviderModule,
+    ChatModule,
+    WebSearchApiModule,
   ],
   controllers: [AppController],
   providers: [

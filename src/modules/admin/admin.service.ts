@@ -196,4 +196,103 @@ export class AdminService {
     });
   }
 
+  async getDashboardStats() {
+    const [totalUsers, activeSubscriptions, plans, totalRequests] = await Promise.all([
+      this.prisma.user.count(),
+      this.prisma.subscription.count({ where: { status: 'ACTIVE' } }),
+      this.prisma.plan.findMany(),
+      this.prisma.apiUsageLog.count(),
+    ]);
+
+    // Simple revenue calculation: just multiplying active subscriptions by their plan price.
+    // In a real production app, we would query Stripe or check 'Payment' table history.
+    let estimatedMonthlyRevenue = 0;
+    const subs = await this.prisma.subscription.findMany({
+      where: { status: 'ACTIVE', planId: { not: null } },
+      include: { planRelation: true }
+    });
+
+    for (const sub of subs) {
+      if (sub.planRelation) {
+        estimatedMonthlyRevenue += sub.planRelation.price;
+      }
+    }
+
+    return {
+      totalUsers,
+      activeSubscriptions,
+      estimatedMonthlyRevenue,
+      totalApiRequests: totalRequests,
+    };
+  }
+
+  async getApiAnalytics() {
+    // Group API Usage by Provider
+    const usageByProvider = await this.prisma.apiUsageLog.groupBy({
+      by: ['providerId'],
+      _count: {
+        id: true,
+      },
+    });
+
+    const providers = await this.prisma.provider.findMany();
+    
+    return usageByProvider.map(usage => {
+      const providerInfo = providers.find(p => p.id === usage.providerId);
+      return {
+        providerName: providerInfo?.name || 'Unknown',
+        totalRequests: usage._count.id
+      };
+    });
+  }
+
+  async getRequestLogs(page: number, limit: number) {
+    const skip = (page - 1) * limit;
+    
+    const [total, data] = await Promise.all([
+      this.prisma.apiUsageLog.count(),
+      this.prisma.apiUsageLog.findMany({
+        skip,
+        take: limit,
+        orderBy: { createdAt: 'desc' },
+        include: {
+          user: { select: { email: true } },
+        }
+      })
+    ]);
+
+    // Map provider names manually since we don't have a strict foreign key relation to Provider
+    const providers = await this.prisma.provider.findMany();
+    const dataWithProviders = data.map(log => {
+      const provider = providers.find(p => p.id === log.providerId);
+      return {
+        ...log,
+        providerName: provider?.name || 'Unknown'
+      };
+    });
+
+    return {
+      data: dataWithProviders,
+      meta: {
+        total,
+        page,
+        limit,
+        lastPage: Math.ceil(total / limit)
+      }
+    };
+  }
+
+  async getSystemHealth() {
+    const memory = process.memoryUsage();
+    return {
+      status: 'OK',
+      uptime: process.uptime(),
+      timestamp: new Date().toISOString(),
+      memory: {
+        rss: `${Math.round(memory.rss / 1024 / 1024)} MB`,
+        heapTotal: `${Math.round(memory.heapTotal / 1024 / 1024)} MB`,
+        heapUsed: `${Math.round(memory.heapUsed / 1024 / 1024)} MB`,
+      }
+    };
+  }
 }

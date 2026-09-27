@@ -66,4 +66,31 @@ export class AdminController {
     return this.adminService.updateUserStatus(id, dto.isActive);
   }
 
+  @Get('dashboard/stats')
+  @ResponseMessage('Dashboard stats retrieved successfully')
+  @ApiOperation({ summary: 'Get total users, active subscriptions, and revenue' })
+  async getDashboardStats() {
+    return this.adminService.getDashboardStats();
+  }
+
+  @Get('analytics/api-usage')
+  @ResponseMessage('API usage analytics retrieved successfully')
+  @ApiOperation({ summary: 'Get API usage stats grouped by provider' })
+  async getApiAnalytics() {
+    return this.adminService.getApiAnalytics();
+  }
+
+  @Get('analytics/request-logs')
+  @ResponseMessage('Request logs retrieved successfully')
+  @ApiOperation({ summary: 'View paginated API usage logs' })
+  async getRequestLogs(@Query('page') page: string = '1', @Query('limit') limit: string = '20') {
+    return this.adminService.getRequestLogs(Number(page), Number(limit));
+  }
+
+  @Get('system/health')
+  @ResponseMessage('System health retrieved successfully')
+  @ApiOperation({ summary: 'Check server memory and uptime' })
+  async getSystemHealth() {
+    return this.adminService.getSystemHealth();
+  }
 }

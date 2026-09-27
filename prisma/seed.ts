@@ -36,7 +36,7 @@ async function main() {
           create: {
             planName: 'FREE',
             status: 'ACTIVE',
-            requestLimit: 999999, // Admins get unlimited basically
+            requestLimit: 999999,
             requestsUsed: 0,
           }
         }
